@@ -1,1 +1,1 @@
-java -cp . Dump https://nokodegendev.pluviadev.com/version 10
+java -cp . Dump https://nokodegendev.pluviadev.com/version 3
