@@ -9,7 +9,8 @@ public class AESGCMEncryption {
     private static final int TAG_LENGTH_BIT = 128;
     private static final int IV_LENGTH_BYTE = 12;  // GCM standard
     private static final String IV = "123456789123";  // must be 12 bytes for GCM
-    private static final String AES_KEY_BASE64 = "bWluZHRvZW50aG91c2VybmFtZXRoYXQ=";  // Base64 encoded key
+    // Replace this with your actual 256-bit (32 bytes) Base64 encoded key
+    private static final String AES_KEY_BASE64 = "3BXiKs2ECJFBfd4IscYZsjiV7k3sB2BrHkICq6RmDBI=";
 
     public static void main(String[] args) throws Exception {
         String plainText = "Hello, World!";
