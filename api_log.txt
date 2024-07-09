@@ -1,60 +1,30 @@
-Task_0: API Call Duration - 0.689 seconds, Response Code - 200
-Task_0: API Call Duration - 0.687 seconds, Response Code - 200
-Task_0: API Call Duration - 0.683 seconds, Response Code - 200
-Task_0: API Call Duration - 0.688 seconds, Response Code - 200
-Task_0: API Call Duration - 0.688 seconds, Response Code - 200
-Task_0: API Call Duration - 0.687 seconds, Response Code - 200
-Task_0: API Call Duration - 0.689 seconds, Response Code - 200
-Task_0: API Call Duration - 0.683 seconds, Response Code - 200
-Task_0: API Call Duration - 0.683 seconds, Response Code - 200
-Task_0: API Call Duration - 0.684 seconds, Response Code - 200
-Task_2: API Call Duration - 0.047 seconds, Response Code - 200
-Task_2: API Call Duration - 0.055 seconds, Response Code - 200
-Task_2: API Call Duration - 0.056 seconds, Response Code - 200
-Task_2: API Call Duration - 0.055 seconds, Response Code - 200
-Task_2: API Call Duration - 0.058 seconds, Response Code - 200
-Task_2: API Call Duration - 0.062 seconds, Response Code - 200
-Task_2: API Call Duration - 0.062 seconds, Response Code - 200
-Task_2: API Call Duration - 0.062 seconds, Response Code - 200
-Task_2: API Call Duration - 0.062 seconds, Response Code - 200
-Task_2: API Call Duration - 0.074 seconds, Response Code - 200
-Task_4: API Call Duration - 0.046 seconds, Response Code - 200
-Task_4: API Call Duration - 0.051 seconds, Response Code - 200
-Task_4: API Call Duration - 0.062 seconds, Response Code - 200
-Task_4: API Call Duration - 0.062 seconds, Response Code - 200
-Task_4: API Call Duration - 0.063 seconds, Response Code - 200
-Task_4: API Call Duration - 0.065 seconds, Response Code - 200
-Task_4: API Call Duration - 0.066 seconds, Response Code - 200
-Task_4: API Call Duration - 0.065 seconds, Response Code - 200
-Task_4: API Call Duration - 0.066 seconds, Response Code - 200
-Task_4: API Call Duration - 0.072 seconds, Response Code - 200
-Task_0: API Call Duration - 0.582 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_0: API Call Duration - 0.576 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_0: API Call Duration - 0.582 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_0: API Call Duration - 0.569 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_0: API Call Duration - 0.582 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_0: API Call Duration - 0.582 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_0: API Call Duration - 0.569 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_0: API Call Duration - 0.576 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_0: API Call Duration - 0.583 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_0: API Call Duration - 0.576 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_2: API Call Duration - 0.089 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_2: API Call Duration - 0.34 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_2: API Call Duration - 0.345 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_2: API Call Duration - 0.345 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_2: API Call Duration - 0.353 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_2: API Call Duration - 0.357 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_2: API Call Duration - 0.357 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_2: API Call Duration - 0.361 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_2: API Call Duration - 0.362 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_2: API Call Duration - 0.363 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_4: API Call Duration - 0.031 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_4: API Call Duration - 0.031 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_4: API Call Duration - 0.033 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_4: API Call Duration - 0.033 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_4: API Call Duration - 0.034 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_4: API Call Duration - 0.122 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_4: API Call Duration - 0.121 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_4: API Call Duration - 0.12 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_4: API Call Duration - 0.126 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
-Task_4: API Call Duration - 0.127 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_0: API Call Duration - 0.606 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_0: API Call Duration - 0.612 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_0: API Call Duration - 0.613 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_0: API Call Duration - 0.612 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_0: API Call Duration - 0.606 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_0: API Call Duration - 0.602 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_0: API Call Duration - 0.606 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_0: API Call Duration - 0.605 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_0: API Call Duration - 0.613 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_0: API Call Duration - 0.605 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_2: API Call Duration - 0.158 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_2: API Call Duration - 0.452 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_2: API Call Duration - 0.46 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_2: API Call Duration - 0.46 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_2: API Call Duration - 0.46 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_2: API Call Duration - 0.468 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_2: API Call Duration - 0.468 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_2: API Call Duration - 0.468 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_2: API Call Duration - 0.469 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_2: API Call Duration - 0.469 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_4: API Call Duration - 0.147 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_4: API Call Duration - 0.149 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_4: API Call Duration - 0.147 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_4: API Call Duration - 0.15 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_4: API Call Duration - 0.152 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_4: API Call Duration - 0.408 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_4: API Call Duration - 0.407 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_4: API Call Duration - 0.411 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_4: API Call Duration - 0.417 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
+Task_4: API Call Duration - 0.42 seconds, Response Code - 200, Response Body - {"status":200,"message":"Server is running","version":"1.1.0"}
