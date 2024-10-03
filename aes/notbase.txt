@@ -1,0 +1,66 @@
+const BASE64_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+
+function isValidBase64(str) {
+  // Check if the length is valid (must be divisible by 4)
+  if (str.length % 4 !== 0) {
+    return false;
+  }
+
+  let paddingCount = 0;
+  let i = 0;
+
+  // Check each character
+  for (; i < str.length; i++) {
+    const char = str[i];
+
+    // If we encounter padding, break the loop
+    if (char === '=') {
+      break;
+    }
+
+    // Check if the character is a valid Base64 character
+    if (!BASE64_CHARS.includes(char)) {
+      return false;
+    }
+  }
+
+  // Check padding
+  for (; i < str.length; i++) {
+    if (str[i] === '=') {
+      paddingCount++;
+    } else {
+      // If we find a non-padding character after padding has started, it's invalid
+      return false;
+    }
+  }
+
+  // Padding can only be 0, 1, or 2 characters
+  if (paddingCount > 2) {
+    return false;
+  }
+
+  // If there's 1 padding character, the last chunk should have 2 Base64 chars
+  // If there are 2 padding characters, the last chunk should have 1 Base64 char
+  const validCharsInLastChunk = str.length - paddingCount;
+  if (paddingCount === 1 && validCharsInLastChunk % 4 !== 3) {
+    return false;
+  }
+  if (paddingCount === 2 && validCharsInLastChunk % 4 !== 2) {
+    return false;
+  }
+
+  return true;
+}
+
+// Test cases
+console.log(isValidBase64("SGVsbG8sIFdvcmxkIQ==")); // true
+console.log(isValidBase64("SGVsbG8sIFdvcmxkIQ")); // false (incorrect padding)
+console.log(isValidBase64("SGVsbG8sIFdvcmxkIQ=====")); // false (too much padding)
+console.log(isValidBase64("SGVsbG8sIFdvcmxkIQ==SGVsbG8=")); // false (multiple chunks)
+console.log(isValidBase64("SGVsbG8sIF@vcmxkIQ==")); // false (invalid character)
+console.log(isValidBase64("")); // true (empty string is valid)
+console.log(isValidBase64("YW55IGNhcm5hbCBwbGVhc3VyZS4=")); // true
+console.log(isValidBase64("YW55IGNhcm5hbCBwbGVhc3VyZQ==")); // true
+console.log(isValidBase64("YW55IGNhcm5hbCBwbGVhc3Vy")); // true
+console.log(isValidBase64("YW55IGNhcm5hbCBwbGVhc3U=")); // true
+console.log(isValidBase64("YW55IGNhcm5hbCBwbGVhcw==")); // true
