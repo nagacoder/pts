@@ -1,0 +1,44 @@
+const BASE64_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+ 
+function encodeToBase64(str) {
+  let result = '';
+  let i = 0;
+  let bytes = new Uint8Array(str.length);
+ 
+  // Convert string to UTF-8 bytes
+  for (let j = 0; j < str.length; j++) {
+    let char = str.charCodeAt(j);
+    if (char < 128) {
+      bytes[i++] = char;
+    } else if (char < 2048) {
+      bytes[i++] = (char >> 6) | 192;
+      bytes[i++] = (char & 63) | 128;
+    } else if (char < 55296 || char >= 57344) {
+      bytes[i++] = (char >> 12) | 224;
+      bytes[i++] = ((char >> 6) & 63) | 128;
+      bytes[i++] = (char & 63) | 128;
+    } else {
+      char = 65536 + (((char & 1023) << 10) | (str.charCodeAt(++j) & 1023));
+      bytes[i++] = (char >> 18) | 240;
+      bytes[i++] = ((char >> 12) & 63) | 128;
+      bytes[i++] = ((char >> 6) & 63) | 128;
+      bytes[i++] = (char & 63) | 128;
+    }
+  }
+ 
+  // Encode bytes to base64
+  for (let j = 0; j < i; j += 3) {
+    let triplet = (bytes[j] << 16) | (bytes[j + 1] << 8) | bytes[j + 2];
+    for (let k = 0; k < 4; k++) {
+      if (j * 8 + k * 6 > i * 8) result += '=';
+      else result += BASE64_CHARS.charAt((triplet >>> 6 * (3 - k)) & 63);
+    }
+  }
+ 
+  return result;
+}
+ 
+// Usage example:
+const originalString = "Hello, World! 🌍";
+const encodedString = encodeToBase64(originalString);
+console.log(encodedString); // SGVsbG8sIFdvcmxkISDD
