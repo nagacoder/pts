@@ -1,0 +1,21 @@
+{
+    "manifest_version": 3,
+    "name": "OpenShift Log Finder",
+    "version": "1.0",
+    "description": "Search OpenShift logs with JSON field support",
+    "permissions": ["activeTab", "scripting"],
+    "background": {
+        "service_worker": "background.js"
+      },
+    "action": {
+      "default_icon": "icon.png"
+    },
+
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["content.js"],
+        "css": ["styles.css"]
+      }
+    ]
+  }

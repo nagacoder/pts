@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>OpenShift Log Finder</title>
+  <style>
+    body {
+      width: 300px;
+      padding: 10px;
+      font-family: Arial, sans-serif;
+    }
+    .search-box {
+      margin-bottom: 10px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 5px;
+      margin-bottom: 5px;
+      box-sizing: border-box;
+    }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    .match-info {
+      margin-top: 5px;
+      text-align: center;
+      font-weight: bold;
+    }
+    button {
+      padding: 5px 10px;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 3px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="search-box">
+    <input type="text" id="search1" class="search-input" placeholder="First condition (e.g., trace_id=abc123)">
+    <input type="text" id="search2" class="search-input" placeholder="Second condition (e.g., ERROR)">
+    <input type="text" id="search3" class="search-input" placeholder="Third condition (e.g., /api/payments)">
+  </div>
+  <div class="match-info">
+    <span id="matchCount">No matches</span>
+  </div>
+  <div class="controls">
+    <button id="prevMatch">◀ Prev</button>
+    <button id="search">🔍 Search</button>
+    <button id="nextMatch">Next ▶</button>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

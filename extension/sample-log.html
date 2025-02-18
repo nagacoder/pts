@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<body>
+<pre>
+2024-02-18T08:00:01.123Z INFO [api-gateway-76d9c45f5-xk2n9] trace_id=tx789abc123 - Incoming request
+2024-02-18T08:00:01.124Z DEBUG [api-gateway-76d9c45f5-xk2n9] trace_id=tx789abc123 - Request details:
+Method: POST
+Path: /api/v2/orders
+Headers: {
+    "content-type": "application/json",
+    "authorization": "Bearer eyJ0eXAiO...[truncated]",
+    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+    "x-request-id": "req_98765",
+    "x-forwarded-for": "192.168.1.100"
+}
+Body: {
+    "customerId": "cust_12345",
+    "items": [
+        {"productId": "prod_789", "quantity": 2},
+        {"productId": "prod_456", "quantity": 1}
+    ],
+    "shippingAddress": {
+        "street": "123 Main St",
+        "city": "Boston",
+        "state": "MA",
+        "zip": "02108"
+    }
+}
+
+2024-02-18T08:00:01.125Z DEBUG [api-gateway-76d9c45f5-xk2n9] trace_id=tx789abc123 - JWT token validation started
+2024-02-18T08:00:01.126Z DEBUG [api-gateway-76d9c45f5-xk2n9] trace_id=tx789abc123 - Token payload: {"sub": "user_456", "role": "customer", "exp": 1708531201}
+2024-02-18T08:00:01.127Z INFO [api-gateway-76d9c45f5-xk2n9] trace_id=tx789abc123 - Token validation successful
+
+2024-02-18T08:00:01.128Z INFO [order-service-5d8b9f4e7-j9h8g] trace_id=tx789abc123 - Received order creation request
+2024-02-18T08:00:01.129Z DEBUG [order-service-5d8b9f4e7-j9h8g] trace_id=tx789abc123 - Checking inventory for products: ["prod_789", "prod_456"]
+2024-02-18T08:00:01.130Z INFO [inventory-service-3f7d2e1a9-n5m4l] trace_id=tx789abc123 span_id=span_1 - Inventory check started
+2024-02-18T08:00:01.131Z DEBUG [inventory-service-3f7d2e1a9-n5m4l] trace_id=tx789abc123 span_id=span_1 - Database query: SELECT product_id, quantity FROM inventory WHERE product_id IN ('prod_789', 'prod_456')
+2024-02-18T08:00:01.132Z DEBUG [inventory-service-3f7d2e1a9-n5m4l] trace_id=tx789abc123 span_id=span_1 - Query result: [{"product_id":"prod_789","quantity":15},{"product_id":"prod_456","quantity":8}]
+2024-02-18T08:00:01.133Z INFO [inventory-service-3f7d2e1a9-n5m4l] trace_id=tx789abc123 span_id=span_1 - Inventory check completed
+
+2024-02-18T08:00:01.134Z INFO [order-service-5d8b9f4e7-j9h8g] trace_id=tx789abc123 - Creating order in database
+2024-02-18T08:00:01.135Z DEBUG [order-service-5d8b9f4e7-j9h8g] trace_id=tx789abc123 - Generated order ID: ord_abcd1234
+2024-02-18T08:00:01.136Z INFO [order-service-5d8b9f4e7-j9h8g] trace_id=tx789abc123 - Order created successfully
+
+2024-02-18T08:00:01.137Z INFO [payment-service-2c6b8d3f1-k7l6j] trace_id=tx789abc123 span_id=span_2 - Initiating payment processing
+2024-02-18T08:00:01.138Z DEBUG [payment-service-2c6b8d3f1-k7l6j] trace_id=tx789abc123 span_id=span_2 - Payment request:
+{
+    "orderId": "ord_abcd1234",
+    "amount": 79.98,
+    "currency": "USD",
+    "paymentMethod": {
+        "type": "credit_card",
+        "last4": "4242"
+    }
+}
+
+2024-02-18T08:00:01.139Z DEBUG [payment-service-2c6b8d3f1-k7l6j] trace_id=tx789abc123 span_id=span_2 - Calling Stripe API
+2024-02-18T08:00:01.140Z WARN [payment-service-2c6b8d3f1-k7l6j] trace_id=tx789abc123 span_id=span_2 - Stripe API latency high: 1500ms
+2024-02-18T08:00:01.141Z INFO [payment-service-2c6b8d3f1-k7l6j] trace_id=tx789abc123 span_id=span_2 - Payment processed successfully
+2024-02-18T08:00:01.142Z DEBUG [payment-service-2c6b8d3f1-k7l6j] trace_id=tx789abc123 span_id=span_2 - Payment response:
+{
+    "id": "py_stripe_789",
+    "status": "succeeded",
+    "amount": 7998,
+    "currency": "usd"
+}
+
+2024-02-18T08:00:01.143Z INFO [notification-service-9a4c7b2e8-h6g5f] trace_id=tx789abc123 span_id=span_3 - Sending order confirmation email
+2024-02-18T08:00:01.144Z DEBUG [notification-service-9a4c7b2e8-h6g5f] trace_id=tx789abc123 span_id=span_3 - Email template: ORDER_CONFIRMATION
+2024-02-18T08:00:01.145Z INFO [notification-service-9a4c7b2e8-h6g5f] trace_id=tx789abc123 span_id=span_3 - Email sent successfully
+
+2024-02-18T08:00:01.146Z INFO [api-gateway-76d9c45f5-xk2n9] trace_id=tx789abc123 - Sending response
+2024-02-18T08:00:01.147Z DEBUG [api-gateway-76d9c45f5-xk2n9] trace_id=tx789abc123 - Response details:
+Status: 201 Created
+Headers: {
+    "content-type": "application/json",
+    "x-request-id": "req_98765",
+    "x-response-time": "24ms"
+}
+Body: {
+    "orderId": "ord_abcd1234",
+    "status": "confirmed",
+    "paymentId": "py_stripe_789",
+    "estimatedDelivery": "2024-02-21"
+}
+
+2024-02-18T08:00:02.123Z ERROR [payment-service-2c6b8d3f1-k7l6j] trace_id=tx456def789 - Payment processing failed
+2024-02-18T08:00:02.124Z DEBUG [payment-service-2c6b8d3f1-k7l6j] trace_id=tx456def789 - Error details:
+{
+    "error": {
+        "code": "card_declined",
+        "message": "Your card has insufficient funds.",
+        "decline_code": "insufficient_funds",
+        "charge_id": "ch_declined_123"
+    },
+    "request_id": "req_stripe_456"
+}
+2024-02-18T08:00:02.125Z INFO [payment-service-2c6b8d3f1-k7l6j] trace_id=tx456def789 - Notifying user about payment failure
+2024-02-18T08:00:02.126Z DEBUG [payment-service-2c6b8d3f1-k7l6j] trace_id=tx456def789 - Retry attempt 1/3
+
+2024-02-18T08:00:03.123Z WARN [metrics-service-1e5d4c3b2-d3c2b] trace_id=tx123ghi456 - High API latency detected
+2024-02-18T08:00:03.124Z DEBUG [metrics-service-1e5d4c3b2-d3c2b] trace_id=tx123ghi456 - Latency metrics:
+{
+    "endpoint": "/api/v2/orders",
+    "p95": 450,
+    "p99": 850,
+    "max": 1200,
+    "min": 95,
+    "mean": 280
+}
+2024-02-18T08:00:03.125Z INFO [metrics-service-1e5d4c3b2-d3c2b] trace_id=tx123ghi456 - Generating performance report
+
+2024-02-18T08:00:04.123Z INFO [cache-service-8f1e2d3c4-b1a2z] trace_id=tx789jkl123 - Cache hit ratio: 0.87
+2024-02-18T08:00:04.124Z DEBUG [cache-service-8f1e2d3c4-b1a2z] trace_id=tx789jkl123 - Cache statistics:
+{
+    "hits": 8720,
+    "misses": 1280,
+    "keys": 15234,
+    "memory_usage": "456MB",
+    "evictions": 123
+}
+
+2024-02-18T08:00:05.123Z ERROR [db-service-4a3b2c1d9-e8f7g] trace_id=tx321mno654 - Database connection error
+2024-02-18T08:00:05.124Z DEBUG [db-service-4a3b2c1d9-e8f7g] trace_id=tx321mno654 - Connection details:
+Host: db-master-east.internal
+Port: 5432
+Error: connection refused
+Stack trace:
+    at Connection.connect (/app/node_modules/pg/lib/connection.js:123:17)
+    at Pool.connect (/app/node_modules/pg/lib/pool.js:384:23)
+    at async DatabaseService.query (/app/src/services/database.js:45:12)
+
+2024-02-18T08:00:05.125Z WARN [db-service-4a3b2c1d9-e8f7g] trace_id=tx321mno654 - Failing over to replica
+2024-02-18T08:00:05.126Z INFO [db-service-4a3b2c1d9-e8f7g] trace_id=tx321mno654 - Connected to replica successfully
+</pre>
+</body>
+</html>
