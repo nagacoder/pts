@@ -1,58 +1,65 @@
-// RIBLogin class equivalent
+/**
+ * JavaScript implementation of RSA password encryption
+ * Converted from Java implementation
+ */
+
 class RIBLogin {
   constructor(serverPublicKey) {
     this.serverPublicKey = serverPublicKey;
+    this.rsaObfuscation = new RSAObfuscation();
   }
 
-  // Method to encrypt password as char array
+  /**
+   * Encrypts a password using the server's public key and random value
+   * @param {string|char[]} password - The password to encrypt
+   * @param {string} serverRandom - Random value from server
+   * @returns {string} - Encrypted password
+   */
   encryptPasswordChar(password, serverRandom) {
     try {
-      // Create RSA encryption object
-      const rsaObj = new RSAObfuscation();
+      // Handle both string and char array inputs
+      const passwordArray = Array.isArray(password) ? password : Array.from(password);
       
-      // Set public key (assuming the serverPublicKey contains both n and e values)
-      // In a real implementation, you'd parse the key properly
-      const keyParts = this.serverPublicKey.split(',');
-      if (keyParts.length >= 2) {
-        rsaObj.setPublic(keyParts[0], keyParts[1]);
-      } else {
-        throw new Error("Invalid server public key format");
+      // Get the PKCS15 formatted block
+      const pkcs15Block = this.buildPKCS15BlockForPassword(passwordArray, serverRandom);
+      
+      if (!pkcs15Block) {
+        return null;
       }
       
-      // Build the PKCS#15 block
-      const encryptBlock = this.buildPKCS15BlockForLoginChar(password, serverRandom);
+      // Set the public key for RSA encryption
+      const publicKeyParts = this.parsePublicKey();
+      this.rsaObfuscation.setPublic(publicKeyParts.modulus, publicKeyParts.exponent);
       
       // Encrypt the block
-      if (encryptBlock) {
-        return rsaObj.encryptNativeBytes(encryptBlock);
-      }
-      return null;
+      return this.rsaObfuscation.encryptNativeBytes(pkcs15Block);
     } catch (e) {
-      console.error(e);
+      console.error("Encryption error:", e);
       return null;
     }
   }
 
-  // This method wasn't in the original Java snippet but would be needed
-  buildPKCS15BlockForLoginChar(password, random) {
+  /**
+   * Builds a PKCS#15 formatted block for password encryption
+   * @param {char[]} password - The password characters
+   * @param {string} random - Random value from server
+   * @returns {Uint8Array} - The formatted block
+   */
+  buildPKCS15BlockForPassword(password, random) {
     if (password.length > 30) {
       return null;
     }
 
     // Determine block size based on key length
-    let bytes;
-    if (this.serverPublicKey.length === 512) {
-      bytes = new Uint8Array(256);
-    } else {
-      bytes = new Uint8Array(128);
-    }
+    const keyLength = this.serverPublicKey.length;
+    const blockSize = keyLength === 512 ? 256 : 128;
+    const bytes = new Uint8Array(blockSize);
 
-    // Convert password from char array to bytes
-    const passwordStr = password.join('');
+    // Convert password to bytes with UTF-8 encoding
     const encoder = new TextEncoder();
-    const passwordBytes = encoder.encode(passwordStr);
+    const passwordBytes = encoder.encode(password.join(''));
     
-    // Generate 30-byte password portion
+    // Generate the 30-byte password portion with padding
     const formattedPasswordBytes = new Uint8Array(30);
     for (let i = 0; i < 30; i++) {
       if (i < passwordBytes.length) {
@@ -62,28 +69,26 @@ class RIBLogin {
       }
     }
 
-    // Convert the random number from hex string to bytes
+    // Convert the random hex string to bytes
     const randomBytes = this.fromHexString(random);
 
-    // Calculate padding length
-    const zeros = this.serverPublicKey.length === 512
-      ? 256 - randomBytes.length - formattedPasswordBytes.length
-      : 128 - randomBytes.length - formattedPasswordBytes.length;
-
-    // Generate random padding
+    // Calculate padding size
+    const zeros = blockSize - randomBytes.length - formattedPasswordBytes.length;
     const bytesPad = this.randomBytes(zeros);
+
+    // Ensure no zero bytes in padding except specific positions
     for (let i = 0; i < zeros; i++) {
       if (bytesPad[i] === 0x00) {
-        bytesPad[i] = 0x28;
+        bytesPad[i] = 0x28; // Replace zeros with 0x28
       }
     }
 
-    // Set PKCS#1 padding markers
+    // Set required PKCS#1 v1.5 header bytes
     bytesPad[0] = 0x00;
     bytesPad[1] = 0x02;
-    bytesPad[zeros - 1] = 0x00;
+    bytesPad[10] = 0x00;
 
-    // Combine all parts
+    // Combine all parts into final block
     let offset = 0;
     bytes.set(bytesPad, offset);
     offset += bytesPad.length;
@@ -94,71 +99,59 @@ class RIBLogin {
     return bytes;
   }
 
-  // Method to support password change encryption
+  /**
+   * Builds a PKCS#15 block for password change (old and new passwords)
+   * @param {char[]} oldPassword - The old password
+   * @param {char[]} newPassword - The new password
+   * @param {string} random - Random value from server
+   * @returns {Uint8Array} - The formatted block
+   */
   buildPKCS15BlockForPinChangeChar(oldPassword, newPassword, random) {
     if (oldPassword.length > 30 || newPassword.length > 30) {
       return null;
     }
 
     // Determine block size based on key length
-    let bytes;
-    if (this.serverPublicKey.length === 512) {
-      bytes = new Uint8Array(256);
-    } else {
-      bytes = new Uint8Array(128);
-    }
+    const blockSize = this.serverPublicKey.length === 512 ? 256 : 128;
+    const bytes = new Uint8Array(blockSize);
 
-    // Convert old password to bytes
-    const oldPasswordStr = oldPassword.join('');
+    // Convert passwords to bytes with UTF-8 encoding
     const encoder = new TextEncoder();
-    const oldPasswordBytes = encoder.encode(oldPasswordStr);
     
-    // Generate 30-byte old password portion
+    // Process old password
+    const oldPasswordBytes = encoder.encode(oldPassword.join(''));
     const formattedOldPasswordBytes = new Uint8Array(30);
     for (let i = 0; i < 30; i++) {
-      if (i < oldPasswordBytes.length) {
-        formattedOldPasswordBytes[i] = oldPasswordBytes[i];
-      } else {
-        formattedOldPasswordBytes[i] = 0xFF;
-      }
+      formattedOldPasswordBytes[i] = i < oldPasswordBytes.length ? oldPasswordBytes[i] : 0xFF;
     }
-
-    // Convert new password to bytes
-    const newPasswordStr = newPassword.join('');
-    const newPasswordBytes = encoder.encode(newPasswordStr);
     
-    // Generate 30-byte new password portion
+    // Process new password
+    const newPasswordBytes = encoder.encode(newPassword.join(''));
     const formattedNewPasswordBytes = new Uint8Array(30);
     for (let i = 0; i < 30; i++) {
-      if (i < newPasswordBytes.length) {
-        formattedNewPasswordBytes[i] = newPasswordBytes[i];
-      } else {
-        formattedNewPasswordBytes[i] = 0xFF;
-      }
+      formattedNewPasswordBytes[i] = i < newPasswordBytes.length ? newPasswordBytes[i] : 0xFF;
     }
 
-    // Convert the random number from hex string to bytes
+    // Convert random hex string to bytes
     const randomBytes = this.fromHexString(random);
 
-    // Calculate padding length
-    const zeros = this.serverPublicKey.length === 512
-      ? 256 - randomBytes.length - formattedNewPasswordBytes.length - formattedOldPasswordBytes.length
-      : 128 - randomBytes.length - formattedNewPasswordBytes.length - formattedOldPasswordBytes.length;
-
-    // Generate random padding
+    // Calculate padding size
+    const zeros = blockSize - randomBytes.length - formattedNewPasswordBytes.length - formattedOldPasswordBytes.length;
     const bytesPad = this.randomBytes(zeros);
+
+    // Ensure no zero bytes in padding except specific positions
     for (let i = 0; i < zeros; i++) {
       if (bytesPad[i] === 0x00) {
-        bytesPad[i] = 0x28;
+        bytesPad[i] = 0x28; // Replace zeros with 0x28
       }
     }
 
-    // Set PKCS#1 padding markers
+    // Set required PKCS#1 v1.5 header bytes
     bytesPad[0] = 0x00;
     bytesPad[1] = 0x02;
     bytesPad[10] = 0x00;
 
-    // Combine all parts
+    // Combine all parts into final block
     let offset = 0;
     bytes.set(bytesPad, offset);
     offset += bytesPad.length;
@@ -171,22 +164,39 @@ class RIBLogin {
     return bytes;
   }
 
-  // Helper to convert hex string to byte array
-  fromHexString(hexString) {
-    if (!hexString) return new Uint8Array(0);
-    
-    const bytes = new Uint8Array(hexString.length / 2);
-    for (let i = 0; i < hexString.length; i += 2) {
-      const highNibble = parseInt(hexString.charAt(i), 16);
-      const lowNibble = parseInt(hexString.charAt(i + 1), 16);
-      if (!isNaN(highNibble) && !isNaN(lowNibble)) {
-        bytes[i / 2] = (highNibble << 4) | lowNibble;
-      }
-    }
-    return bytes;
+  /**
+   * Parse public key string into modulus and exponent
+   * @returns {Object} Object containing modulus and exponent
+   */
+  parsePublicKey() {
+    // This is a placeholder - the actual implementation would depend on the format of serverPublicKey
+    // For example purposes, assuming serverPublicKey is in format "modulus:exponent"
+    const parts = this.serverPublicKey.split(':');
+    return {
+      modulus: parts[0],
+      exponent: parts.length > 1 ? parts[1] : '10001' // Default exponent is 65537 (0x10001)
+    };
   }
 
-  // Generate random bytes
+  /**
+   * Converts a hex string to a byte array
+   * @param {string} s - Hex string
+   * @returns {Uint8Array} - Byte array
+   */
+  fromHexString(s) {
+    const len = s.length;
+    const data = new Uint8Array(len / 2);
+    for (let i = 0; i < len; i += 2) {
+      data[i / 2] = (parseInt(s.charAt(i), 16) << 4) | parseInt(s.charAt(i + 1), 16);
+    }
+    return data;
+  }
+
+  /**
+   * Generates an array of random bytes
+   * @param {number} length - Number of bytes to generate
+   * @returns {Uint8Array} - Array of random bytes
+   */
   randomBytes(length) {
     const bytes = new Uint8Array(length);
     for (let i = 0; i < length; i++) {
@@ -196,67 +206,87 @@ class RIBLogin {
   }
 }
 
-// RSAObfuscation class equivalent
+/**
+ * JavaScript implementation of RSA encryption
+ */
 class RSAObfuscation {
   constructor() {
-    this.n = null;
-    this.e = null;
+    this.n = null; // modulus
+    this.e = null; // exponent
   }
 
+  /**
+   * Sets the public key components
+   * @param {string} modulus - Modulus in hex format
+   * @param {string} exponent - Exponent in hex format
+   */
   setPublic(modulus, exponent) {
     if (modulus && exponent && modulus.length > 0 && exponent.length > 0) {
-      // In JavaScript, we'll use the BigInt type for large integer operations
       this.n = BigInt('0x' + modulus);
       this.e = BigInt('0x' + exponent);
     }
   }
 
+  /**
+   * Encrypts a byte array using RSA
+   * @param {Uint8Array} bytes - Bytes to encrypt
+   * @returns {string} - Hex string of encrypted data
+   */
   encryptNativeBytes(bytes) {
     try {
-      const byteLength = bytes.length;
-      const keyByteLength = Number((BigInt(this.n.toString(2).length) + 7n) >> 3n);
-      
-      if (byteLength > keyByteLength) {
-        throw new Error("Invalid data length");
+      // Validate input
+      const maxLength = (this.n.toString(2).length + 7) >> 3;
+      if (bytes.length > maxLength) {
+        throw new Error("Invalid input length");
       }
-      
-      // Convert bytes to BigInt
-      let value = 0n;
-      for (let i = 0; i < bytes.length; i++) {
-        value = (value << 8n) | BigInt(bytes[i]);
-      }
+
+      // Convert byte array to BigInt
+      let value = this.bytesToBigInt(bytes);
       
       // Perform RSA encryption: c = m^e mod n
-      const encrypted = this.doPublic(value);
-      if (encrypted === null) {
+      let encryptedValue = this.doPublic(value);
+      if (encryptedValue === null) {
         return null;
       }
+
+      // Convert to hex string with proper padding
+      let hexString = encryptedValue.toString(16);
+      const expectedLength = maxLength * 2;
       
-      // Convert to hex string
-      let hexStr = encrypted.toString(16);
-      
-      // Pad with leading zeros if necessary
-      if (hexStr.length <= (keyByteLength * 2)) {
-        const padding = (keyByteLength * 2) - hexStr.length;
-        hexStr = '0'.repeat(padding) + hexStr;
-        return hexStr;
+      if (hexString.length <= expectedLength) {
+        // Pad with leading zeros if necessary
+        hexString = hexString.padStart(expectedLength, '0');
+        return hexString;
       }
       
       throw new Error("Cannot encode result");
     } catch (e) {
-      console.error(e);
+      console.error("RSA encryption error:", e);
       return null;
     }
   }
 
+  /**
+   * Performs RSA public key operation
+   * @param {BigInt} value - Value to encrypt
+   * @returns {BigInt} - Encrypted value
+   */
   doPublic(value) {
-    if (!this.n || !this.e) return null;
+    if (!this.n || !this.e) {
+      return null;
+    }
     
-    // Using JavaScript's built-in modular exponentiation for BigInt
+    // Perform modular exponentiation: value^e mod n
     return this.modPow(value, this.e, this.n);
   }
-  
-  // Helper function for modular exponentiation (since BigInt doesn't have a direct method)
+
+  /**
+   * Modular exponentiation for BigInt
+   * @param {BigInt} base - Base value
+   * @param {BigInt} exponent - Exponent value
+   * @param {BigInt} modulus - Modulus value
+   * @returns {BigInt} - Result of base^exponent mod modulus
+   */
   modPow(base, exponent, modulus) {
     if (modulus === 1n) return 0n;
     
@@ -273,30 +303,61 @@ class RSAObfuscation {
     
     return result;
   }
+
+  /**
+   * Converts a Uint8Array to a BigInt
+   * @param {Uint8Array} bytes - Byte array
+   * @returns {BigInt} - BigInt representation
+   */
+  bytesToBigInt(bytes) {
+    let hex = Array.from(bytes)
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+    return BigInt('0x' + hex);
+  }
 }
 
-// Example usage function similar to the Java generateEncryptedPasswordChar method
-function generateEncryptedPasswordChar(password, context) {
-  // In JavaScript, we'd fetch the random public key differently
-  // For example, from localStorage or via an API call
-  const getRandomPublicKeyResponse = JSON.parse(localStorage.getItem('GENERATE_RANDOM_PUBLIC') || '{}');
-  
-  const ribLoginUtils = new RIBLogin(getRandomPublicKeyResponse.serverPublicKey);
+/**
+ * Example usage of the encryption
+ */
+function generateEncryptedPassword(password, serverPublicKey, serverRandom) {
+  const ribLoginUtils = new RIBLogin(serverPublicKey);
   let encryptedPassword = null;
   
   try {
     // Convert string password to char array if needed
-    const passwordChars = typeof password === 'string' 
-      ? [...password] 
-      : password;
-      
-    encryptedPassword = ribLoginUtils.encryptPasswordChar(
-      passwordChars, 
-      getRandomPublicKeyResponse.serverRandom
-    );
+    const passwordChars = Array.isArray(password) ? password : Array.from(password);
+    encryptedPassword = ribLoginUtils.encryptPasswordChar(passwordChars, serverRandom);
   } catch (e) {
-    console.error(e);
+    console.error("Encryption error:", e);
   }
   
   return encryptedPassword;
+}
+
+// Example implementation for password change
+function generateEncryptedPasswordChange(oldPassword, newPassword, serverPublicKey, serverRandom) {
+  const ribLoginUtils = new RIBLogin(serverPublicKey);
+  let encryptedData = null;
+  
+  try {
+    // Build the PKCS15 block with both passwords
+    const oldPasswordChars = Array.isArray(oldPassword) ? oldPassword : Array.from(oldPassword);
+    const newPasswordChars = Array.isArray(newPassword) ? newPassword : Array.from(newPassword);
+    
+    const block = ribLoginUtils.buildPKCS15BlockForPinChangeChar(oldPasswordChars, newPasswordChars, serverRandom);
+    
+    if (block) {
+      // Set the public key for RSA encryption
+      const publicKeyParts = ribLoginUtils.parsePublicKey();
+      ribLoginUtils.rsaObfuscation.setPublic(publicKeyParts.modulus, publicKeyParts.exponent);
+      
+      // Encrypt the block
+      encryptedData = ribLoginUtils.rsaObfuscation.encryptNativeBytes(block);
+    }
+  } catch (e) {
+    console.error("Password change encryption error:", e);
+  }
+  
+  return encryptedData;
 }
