@@ -100,71 +100,6 @@ class RIBLogin {
   }
 
   /**
-   * Builds a PKCS#15 block for password change (old and new passwords)
-   * @param {char[]} oldPassword - The old password
-   * @param {char[]} newPassword - The new password
-   * @param {string} random - Random value from server
-   * @returns {Uint8Array} - The formatted block
-   */
-  buildPKCS15BlockForPinChangeChar(oldPassword, newPassword, random) {
-    if (oldPassword.length > 30 || newPassword.length > 30) {
-      return null;
-    }
-
-    // Determine block size based on key length
-    const blockSize = this.serverPublicKey.length === 512 ? 256 : 128;
-    const bytes = new Uint8Array(blockSize);
-
-    // Convert passwords to bytes with UTF-8 encoding
-    const encoder = new TextEncoder();
-    
-    // Process old password
-    const oldPasswordBytes = encoder.encode(oldPassword.join(''));
-    const formattedOldPasswordBytes = new Uint8Array(30);
-    for (let i = 0; i < 30; i++) {
-      formattedOldPasswordBytes[i] = i < oldPasswordBytes.length ? oldPasswordBytes[i] : 0xFF;
-    }
-    
-    // Process new password
-    const newPasswordBytes = encoder.encode(newPassword.join(''));
-    const formattedNewPasswordBytes = new Uint8Array(30);
-    for (let i = 0; i < 30; i++) {
-      formattedNewPasswordBytes[i] = i < newPasswordBytes.length ? newPasswordBytes[i] : 0xFF;
-    }
-
-    // Convert random hex string to bytes
-    const randomBytes = this.fromHexString(random);
-
-    // Calculate padding size
-    const zeros = blockSize - randomBytes.length - formattedNewPasswordBytes.length - formattedOldPasswordBytes.length;
-    const bytesPad = this.randomBytes(zeros);
-
-    // Ensure no zero bytes in padding except specific positions
-    for (let i = 0; i < zeros; i++) {
-      if (bytesPad[i] === 0x00) {
-        bytesPad[i] = 0x28; // Replace zeros with 0x28
-      }
-    }
-
-    // Set required PKCS#1 v1.5 header bytes
-    bytesPad[0] = 0x00;
-    bytesPad[1] = 0x02;
-    bytesPad[10] = 0x00;
-
-    // Combine all parts into final block
-    let offset = 0;
-    bytes.set(bytesPad, offset);
-    offset += bytesPad.length;
-    bytes.set(randomBytes, offset);
-    offset += randomBytes.length;
-    bytes.set(formattedNewPasswordBytes, offset);
-    offset += formattedNewPasswordBytes.length;
-    bytes.set(formattedOldPasswordBytes, offset);
-
-    return bytes;
-  }
-
-  /**
    * Parse public key string into modulus and exponent
    * @returns {Object} Object containing modulus and exponent
    */
@@ -333,31 +268,4 @@ function generateEncryptedPassword(password, serverPublicKey, serverRandom) {
   }
   
   return encryptedPassword;
-}
-
-// Example implementation for password change
-function generateEncryptedPasswordChange(oldPassword, newPassword, serverPublicKey, serverRandom) {
-  const ribLoginUtils = new RIBLogin(serverPublicKey);
-  let encryptedData = null;
-  
-  try {
-    // Build the PKCS15 block with both passwords
-    const oldPasswordChars = Array.isArray(oldPassword) ? oldPassword : Array.from(oldPassword);
-    const newPasswordChars = Array.isArray(newPassword) ? newPassword : Array.from(newPassword);
-    
-    const block = ribLoginUtils.buildPKCS15BlockForPinChangeChar(oldPasswordChars, newPasswordChars, serverRandom);
-    
-    if (block) {
-      // Set the public key for RSA encryption
-      const publicKeyParts = ribLoginUtils.parsePublicKey();
-      ribLoginUtils.rsaObfuscation.setPublic(publicKeyParts.modulus, publicKeyParts.exponent);
-      
-      // Encrypt the block
-      encryptedData = ribLoginUtils.rsaObfuscation.encryptNativeBytes(block);
-    }
-  } catch (e) {
-    console.error("Password change encryption error:", e);
-  }
-  
-  return encryptedData;
 }
